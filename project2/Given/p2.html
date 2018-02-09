@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSC230 Project 2 – </title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="./style.css" type="text/css" />
+</head>
+<body>
+<h1 id="csc-230-project-2">CSC 230 Project 2</h1>
+<h1 id="triangle-drawing-program">Triangle-Drawing Program</h1>
+<p>For this project, you're going to write two versions of a simple, image-drawing program. Both versions create an image with a single triangle drawn on it, like the figure below. The picture on the left shows a 10 X 10 pixel image, with a blue triangle you're expected to draw. The picture on the right shows how your program will draw this triangle, by filling in pixels with the triangle's color.</p>
+<div class="figure">
+<img src="example-1.png" alt="Drawing a blue triangle by filling in pixels that fall inside it." />
+<p class="caption">Drawing a blue triangle by filling in pixels that fall inside it.</p>
+</div>
+<p>The two versions of your program will create the output image in slightly different versions of the PPM image format. This is a very simple image format, with no compression. One of your programs will output the text version of this format, where pixel colors are written out as text. The other version will output pixel colors in binary instead of text. This will reduce the image size, but still not nearly as much as you'd expect for a real, compressed image format.</p>
+<p>To help get you started, we're providing you with a few partial implementation files, a test script, and several test input files and expected output files. See the <a href="#started">Getting Started</a> section for instructions on how to set up your development environment so that you can be sure to submit everything needed when you're done.</p>
+<p>This project supports a number of our course objectives. See the <a href="#outcomes">Learning Outcomes</a> section for a list.</p>
+<h2 id="rules-for-project-2">Rules for Project 2</h2>
+<p>You get to complete this project individually. If you're unsure of what's permitted, you can have a look at the academic integrity guidelines in the course syllabus.</p>
+<p>In the design section, you'll see some instructions for how your implementation is expected to work. Be sure you follow these rules. It's not enough to just turn in a working program; your program has to follow the design constraints we've asked you to follow.</p>
+<h1 id="requirements">Requirements</h1>
+<p>Requirements are a way of describing what a program is supposed to be able to do. In software development, writing down and discussing requirements is a way for developers and a customers to agree on the details of a system's capabilities, often before coding has even begun. Here, we're trying to demonstrate good software development practice by writing down requirements for our program, before we start talking about how we're going to implement it.</p>
+<h2 id="program-input">Program Input</h2>
+<p>The <code>triangle</code> program will take several integer and floating point values as input, read from standard input (i.e., from the terminal). First, it will expect two positive integers giving the width and the height of the desired output image (measured in pixels).</p>
+<p>After the image size, the program will expect six floating point values (that should be parsed using the <code>double</code> type), <em>x1</em> <em>y1</em> <em>x2</em> <em>y2</em> <em>x3</em> <em>y3</em>. These give the locations of the triangle's vertices in counter-clockwise order. The first two values, <em>x1</em> <em>y1</em>, are the location of the first vertex, the next two, <em>x2</em> <em>y2</em>, give the location of the second vertex, and the last two, <em>x3</em> <em>y3</em> give the location of the third vertex.</p>
+<p>Finally, the program should expect integers giving the Red, Green and Blue (RGB) components for the color the triangle should be drawn in. Each color value should be between 0 and 255, inclusive.</p>
+<p>The following sample input describes the picture given at the start of the assignment. We're asked to generate a 10 X 10 image containing a triangle with vertices at ( 2.5, 1.5 ), ( 0.5, 8.5 ) and ( 8.5, 5.5 ). The triangle should be drawn by filling in pixels with a red value of 114, a green value of 159 and a blue value of 207 (so, a light-blue triangle).</p>
+<pre><code>10 10
+2.5 1.5 0.5 8.5 8.5 5.5
+114 159 207</code></pre>
+<p>The program is expected to detect invalid input, input values that are out of range or that don't parse as integer or floating point values as expected. If there's something wrong with the input, the program should terminate immediately with an exit status of <code>EXIT_FAILURE</code>.</p>
+<h2 id="text-image-output">Text Image Output</h2>
+<p>The <code>triangle</code> program will write its output image to standard output. We haven't learned how to do file I/O yet, but we can use I/O redirection to get our program to write to any file we want. We'll run it like the following to trick it into doing file I/O instead.</p>
+<pre><code>$ ./triangle &lt; input.txt &gt; output.ppm</code></pre>
+<p>The <code>triangle</code> program will write images in a simple, uncompressed format called PPM. This format isn't as popular as some other image formats (particularly because it isn't very space efficient), but there are a few programs that support it, and it's really easy to generate. We'll place some additional constants on our output images, to make it easier to check the correctness of the output.</p>
+<p>The text PPM image format starts with a 3-line header like the following. The <code>P3</code> on the first line says that this file is an image in plain (text) PPM format, the next line gives the size of the image, 60 pixels wide and 45 pixels tall for this example. The third line gives the maximum intensity for the red, green and blue color components of the image's pixels. All the images we work with will be at least 1 pixel wide and 1 pixels tall, and they'll all have 255 as their maximum intensity.</p>
+<pre><code>P3
+60 45
+255</code></pre>
+<p>A PPM image gives the color values for all the pixels after the header. This starts with the color for all the pixels on the top row of the image, left-to-right. This is followed by color values for the next row of the image, and so on. Each pixel's color is given as three integer values, a red intensity ranging from 0 (no red) to 255 (maximum red), then a green intensity, then blue (also between 0 and 255). For example, the following text:</p>
+<pre><code>P3
+4 4
+255
+255 255   0 255 255   0 255 255   0 255 255   0 
+255 255   0 255   0   0 128 128 128 255 255   0 
+255 255   0   0 255   0   0   0 255 255 255   0 
+255 255   0 255 255   0 255 255   0 255 255   0 </code></pre>
+<p>.. is a PPM description of the following image (enlarged considerably in this picture to show the individual pixels).</p>
+<div class="figure">
+<img src="ppm_example.png" alt="Image represented by the PPM example given above." />
+<p class="caption">Image represented by the PPM example given above.</p>
+</div>
+<p>In this example, all the pixels around the edge of the 4 X 4 image have a value of &quot;255 255 0&quot;. This represents red and green at maximum intensity with no blue, so the image has a yellow border. Inside this border, the upper left pixel (the second group of three values on the second line of pixel data) has a value of &quot;255 0 0&quot;, so we get a red pixel. Just to the right, we have a pixel with all colors at half intensity, so we get gray. The middle two pixels on the next row represent a green pixel &quot; 0 255 0&quot; and a blue pixel &quot; 0 0 255&quot;.</p>
+<p>The text PPM format permits any amount of space between the integers describing pixel colors. In the example above, I put the each row of the image on a separate line of text, and added extra spaces between some values to make the columns line up.</p>
+<p>For our output images, we're going to use a simpler organization for the pixel data. The PPM format requires that we print the pixel data from top row of the image to the bottom row, with each row of pixels given left to right, but we don't have to organize these values with each row of the image on its own output line. Instead, we're just going to fit as many output RGB components as we can on each output line, as long as each output line is no more than 70 characters long. On each output line values will be separated by a single space (so, no extra space at the end of the line). The last output line will end with a line terminator (<code>\n</code> ), just like we'd normally expect for a text file.</p>
+<p>In our output format, the small image shown above would get written like the following. The first output line contains the first row of pixel data, along with some of the second row. The next line finishes up the second row, then gives the whole third row and the start of the last row. The last line gives the last few values for the fourth row of the image.</p>
+<pre><code>P3
+4 4
+255
+255 255 0 255 255 0 255 255 0 255 255 0 255 255 0 255 0 0 128 128 128
+255 255 0 255 255 0 0 255 0 0 0 255 255 255 0 255 255 0 255 255 0 255
+255 0 255 255 0 </code></pre>
+<h2 id="binary-image-output">Binary Image Output</h2>
+<p>One version of our program will output images using the slightly more compressed binary PPM format. The header for this format is almost the same as the text format, except that it starts with &quot;P6&quot; instead of &quot;P3&quot;. The main difference is in how the RGB values are encoded. In the binary format, each color component is written out as a single byte, starting right after the newline character at the end of the header. Pixel colors are still given in the same order as the text format, but with each component written out as a single byte and without the need for delimiters (spaces) between values, this format yields a much smaller file size than the text format (but still not nearly as small as a real, compressed format would give you).</p>
+<p>In the binary PPM format, the sample image above would look more like the following:</p>
+<pre><code>P6
+4 4
+255
+     binary pixel data
+one byte per color component</code></pre>
+<p>Or, if you wanted to see what the binary encoding for the pixel data looks like, you could look at this image file using <code>hexdump -C</code>. You'd get something like the following. You can see the header is in plain text, but after the 255 and the newline character at the end of the header, there are 4 X 4 X 3 bytes containing the color components of the image.</p>
+<pre><code>00000000  50 36 0a 34 20 34 0a 32  35 35 0a ff ff 00 ff ff  |P6.4 4.255......|
+00000010  00 ff ff 00 ff ff 00 ff  ff 00 ff 00 00 80 80 80  |................|
+00000020  ff ff 00 ff ff 00 00 ff  00 00 00 ff ff ff 00 ff  |................|
+00000030  ff 00 ff ff 00 ff ff 00  ff ff 00                 |...........|</code></pre>
+<h2 id="triangle-drawing">Triangle Drawing</h2>
+<p>We'll draw the output image in black (0 for each of the the RGB values), except for pixels that are in the triangle. Those will get the color specified by the last three values from the input.</p>
+<p>We'll think of each pixel as a little 1 X 1 square. The left edge of the leftmost column of pixels will be at x = 0. The right edge of this column will be at x = 1, right at the left edge of the next column.</p>
+<div class="figure">
+<img src="pixel.png" alt="Geometry of pixels in the image." />
+<p class="caption">Geometry of pixels in the image.</p>
+</div>
+<p>Vertically, we'll think of the Y axis as pointing down (a typical convention for talking about images). The top edge of the first row of pixels will be at y = 0, and bottom edge of this row will be at y = 1, right at the top edge of the next row.</p>
+<p>We'll use the center of each pixel to decide whether that pixel is inside the triangle. In the following figure, for example, the pixel in row 5, column 3 (both counting from zero) has its center at coordinates x = 3.5, y = 5.5.</p>
+<div class="figure">
+<img src="pixel-center.png" alt="Center point used to decide whether a pixel is inside the triangle" />
+<p class="caption">Center point used to decide whether a pixel is inside the triangle</p>
+</div>
+<p>The following figure shows how we'll decide whether a pixel is inside the triangle. We'll compute a vector between two consecutive vertices on the triangle (taken in counter clockwise order, labeled <var>V<sub>e</sub></var> in the figure). We'll also compute a vector between the first of these vertices and the center of some pixel (labeled <var>V<sub>p</sub></var> in the figure). The sign of the cross product of <var>V<sub>e</sub></var> and <var>V<sub>p</sub></var> will tell us whether the vector to the pixel is a left turn compared to the vector along the edge of the triangle.</p>
+<div class="figure">
+<img src="left-turn.png" alt="Left turn test, for checking if a pixel is inside the triangle." />
+<p class="caption">Left turn test, for checking if a pixel is inside the triangle.</p>
+</div>
+<p>If you don't remember how to compute the cross product, it's pretty easy. Normally, it's defined for three-dimensional vectors, but it simplifies down to two dimensions if we just assume everything is in the XY plane. Let's say vector <var>V<sub>e</sub></var> has X and Y components <var>( x<sub>e</sub>, y<sub>e</sub> )</var> and vector <var>V<sub>p</sub></var> is defined as ( x<sub>p</sub>, y<sub>p</sub> )</var>. The cross product of these vectors can be calculated as <var>x<sub>e</sub> y<sub>p</sub> - y<sub>e</sub> x<sub>p</sub></var>. If this quantity is less than zero, then <var>V<sub>p</sub></var> is a left turn from <var>V<sub>e</sub></var>. This may be backward from what you expect (if you're familiar with the cross product), but it's because our Y axis is pointing down instead of up.</p>
+<p>We'll apply this left turn test for each edge of the triangle. If they all report that the vector to the pixel is to the left of the vector along the edge of the triangle, we'll say the pixel is inside the triangle. Otherwise, we'll say it's not. Pixels right on an edge of the triangle will yield a cross product of zero. We'll say these pixels are also inside the triangle.</p>
+<h1 id="design">Design</h1>
+<p>The <code>triangle</code> program will be implemented using two header files and four implementation files. The two header files are mostly written for you, but you get to fill in some of the comments.</p>
+<ul>
+<li><p>geometry.h<br />
+This is the header file for the geometry component. It contains prototypes for functions that help decide whether a given point is inside the triangle being drawn.</p></li>
+<li><p>geometry.c<br />
+This is the implementation file for the geometry component. It contains definitions for functions that help decide whether a given point is inside the triangle.</p></li>
+<li><p>encoding.h<br />
+This is the header file for the encoding component. It contains prototypes for functions that let us write out the image in either the text format or the binary format.</p></li>
+<li><p>text.c<br />
+This file is a little unusual. It's one of two implementation files that goes with the encoding.h header. Normally, an implementation and its header would share the same base name, but here we're using the encoding.h header to describe the interface for the encoding functions, with either text.c or binary.c being linked in to supply the definitions of these functions. This file contains implementations of the encoding functions to write out the image in the text format.</p></li>
+<li><p>binary.c<br />
+This file is like text.c, but it provides implementations of the encoding functions that write out an image in our binary format.</p></li>
+<li><p>triangle.c<br />
+This is the top-level, main component. It contains the main() function and is responsible for reading the input and lookking for errors in the input. Then, it generates the output image, with help from the other two components.</p></li>
+</ul>
+<h2 id="encoding-selection">Encoding Selection</h2>
+<p>You can see we have two different implementations of the encoding component. We'll select the encoding we want by linking together an executable that has just the one of these two implementations (either text.c or binary.c, but not both). If we link with the text implementation, we'll get a text encoding. If we link with the binary implementation, we'll get binary. The testing section below has some simple gcc commands for compiling this project either way.</p>
+<h2 id="image-generation">Image Generation</h2>
+<p>We haven't learned about arrays yet, so we don't have a good way to store the whole image in memory. Instead, we'll color in the triangle as we output the image, testing each pixel right before we print it to see if it's inside the triangle.</p>
+<h2 id="required-functions">Required Functions</h2>
+<p>You can use as many functions as you want to solve this problem, but you'll need to implement and use at least the following four.</p>
+<ul>
+<li><p><code>bool leftOf( double xa, double ya, double xb, double yb, double x, double y );</code><br />
+This function helps to determine whether a pixel is inside the triangle. It implements the left-turn test described in the Requirements. The first four parameters give it the location of two consecutive vertices of the triangle (in counter-clockwise order), and the last two parameters give the location of the center of a pixel. This function is part of the <code>geometry</code> component.</p></li>
+<li><p><code>bool inside( double x1, double y1, double x2, double y2, double x3, double y3, double x, double y );</code><br />
+This function uses leftOf() to determine whether a pixel (the last two parameters) is inside the triangle. It's part of the <code>geometry</code> component.</p></li>
+<li><p><code>void printHeader( int width, int height );</code><br />
+This function is part of the <code>encoding</code> component. It's implemented in the <code>text.c</code> to print a header for a text encoding and in the <code>binary.c</code> file, to print a header for a binary encoding. The parameters give the size of the image (which is required for the header).</p></li>
+<li><p><code>void printValue( unsigned char c );</code><br />
+This function is part of the <code>encoding</code> component. It prints one of the RGB components (given via the parameter). It's implemented in the <code>text.c</code> to print a value in a text encoding and in the <code>binary.c</code> file, to print a value for a binary encoding.</p></li>
+</ul>
+<p>The printValue() function in <code>binary.c</code> can be really simple. It just has to print out the given value as a single char (you know a couple of functions from the standard library that can do this for you). The version of printValue() in <code>text.c</code> is going to need to be a little smarter. It has to print out the given value in text (which is easy), but it has to make sure it doesn't exceed the maximum line length of 70 characters. To do this, it will need some persistent state. This is a good job for a static local variable. Use one to keep up keep up with how many characters long the current output line is. Then, before you print the next value, you can decide if it's going to make the current output line too long, and start printing on a new output line if you need to. You'll need to fiure out how many digits it takes to print the value you're about to print (so you can tell if it will fit on the output line). You'll have to write a little code to figure this out. If it helps, remember that all the RGB values must be between 0 and 255.</p>
+<h2 id="floating-point-representation">Floating Point Representation</h2>
+<p>Use values of type double for any floating point calculations you need to do.</p>
+<h2 id="globals-and-magic-numbers">Globals and Magic Numbers</h2>
+<p>You should be able to complete this project without using any global variables. The function parameters give each function everything it needs.</p>
+<p>Be sure to avoid magic numbers in your source code. Use the preprocessor to give a meaningful name to all the important, non-obvious values you need to use (e.g., the values used for your program's exit status).</p>
+<h1 id="extra-credit">Extra Credit</h1>
+<p>For up to 8 points of <strong>extra credit</strong>, you can implement a compile-time option for anti-aliasing the output image, to hide the stair-steps along the edge of the triangle. We can do this with super-sampling, testing multiple locations inside each pixel to determine how much of the pixel is actually inside the triangle.</p>
+<p>The following (enlarged) image shows the effects of anti-aliasing. Pixels along the edge of the triangle are shaded to hide the stair-step from one pixel to the next.</p>
+<div class="figure">
+<img src="aa3.png" alt="Anti-aliasing to smooth triangle edges." />
+<p class="caption">Anti-aliasing to smooth triangle edges.</p>
+</div>
+<p>In the starter, you'll see that there's a preprocessor constant called <code>SSAMP</code> defined in the geometry header. It's set to one, but it's possible to set it to larger values using a compiler option. Compiling with the <code>-DSSAMP=3</code> flag will override its value from the header file, setting it to 3 instead. If you do the extra credit, use this constant to determine how many horizontal and vertical samples to use for each pixel.</p>
+<p>For super-sampling, we'll think of each pixel as consiting of SSAMP X SSAMP smaller, square regions. We'll test the center of each of these to see if it's inside the triangle. Then, we'll shade the pixel based on how many of these samples fall inside the triangle. That way, pixels on the edge of the triangle will be shaded with an intermediate color between the background color (black) and the color of the triangle.</p>
+<div class="figure">
+<img src="super-sample.png" alt="Illustraton of 2x2 super-sampling" />
+<p class="caption">Illustraton of 2x2 super-sampling</p>
+</div>
+<p>The picture above shows 2x2 supersampling, with each pixel bronken into 4 smaller regions and the center of each tested against the triangle. If SSAMP was 3, you'd sample each pixel using the centers of 3 X 3 = 9 smaller squares, shading it based on how many of these samples were inside the triangle. To choose the right shade, compute a weighted average of the background color (black) and the triangle color given in the input. The weight for the background will be the number of samples that fall outside the triangle (divided by SSAMP<var><sup>2</sup></var>), and the weight for the triangle color will be the number of samples that fall inside the triangle (divided by SSAMP<var><sup>2</sup></var>). This weighted average yields a floating point intensity for each RGB value. Use the round() function to round it to the nearest integer intensity for each RGB value. The round() function is part of the math library, so you'll need to include the math.h header and link with the math library (-lm) if you do the extra credit.</p>
+<p>If you do the extra credit, we have two expected output files you can compare your output against. Compile your program with a SSAMP value of 3. On input-3.txt, you should get output identical to <a href="expected-ec3.ppm" class="uri">expected-ec3.ppm</a> (encoded in text). On input-3.txt, you should get output identical to and <a href="expected-ec7.ppm" class="uri">expected-ec7.ppm</a> (also text encoding)</p>
+<h1 id="testing">Testing</h1>
+<p>The starter includes a test script, along with test input files and expected outputs for both versions of your program. When we grade your program, we'll test it with this script, along with a few other test inputs we're not giving you. To run the automated test script, you should be able to enter the following:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">chmod</span> +x test.sh <span class="co"># probably just need to do this once</span>
+$ <span class="kw">./test.sh</span></code></pre></div>
+<p>This will automatically build each version of your program and see how they behave on all the provided test inputs.</p>
+<p>You probably won't pass all the tests the first time. The test script reports how it's running your program for each test. This should help you see how you can run a particular test yourself, to try to figure out what's going wrong.</p>
+<p>If you want to compile the text-encoding version by hand, the following command should do the job. The -lm option tells the compiler to link with the math library, which you probably only need if you did the extra credit.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">gcc</span> -Wall -std=c99 -g triangle.c geometry.c text.c -o triangle -lm</code></pre></div>
+<p>If you want to compile the binary-encoding version, the following should work. With the binary version, we're using a slightly different name for the executable, so we can keep both versions of the program around at the same time.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">gcc</span> -Wall -std=c99 -g triangle.c geometry.c binary.c -o btriangle -lm</code></pre></div>
+<p>To run the text-encoding version, you can do something like the following. These commands run the program with input read from the <code>input-3.txt</code> test case and with output written to the file, <code>output.ppm</code>. Then, we check the exit status to make sure the program exited successfully (it should for this particular test case). Finally, we use diff to make sure the output we got looks exactly like the expected output.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">./triangle</span> <span class="kw">&lt;</span> input-3.txt <span class="kw">&gt;</span> output.ppm
+$ <span class="kw">echo</span> <span class="ot">$?</span>
+<span class="kw">0</span>
+$ <span class="kw">diff</span> expected-t3.ppm output.ppm</code></pre></div>
+<p>If your program generated the correct output, diff shouldn't report anything. If your output isn't exactly right, diff will tell you where it sees differences. Keep in mind that diff may complain about differences in the output that you can't see, like differences in spacing or a space at the end of a line. Also, for the larger output images, it may be difficult to tell what part of the image diff is complaining about. The Image Comparison program described below may help with this.</p>
+<p>To run the binary-encoding version of your program, you can do something like the following. Like the previous example, we're running against one of the test inputs and checking the exit status and the contents of the output after the program finishes.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">./btriangle</span> <span class="kw">&lt;</span> input-6.txt <span class="kw">&gt;</span> output.ppm
+$ <span class="kw">echo</span> <span class="ot">$?</span>
+<span class="kw">0</span>
+$ <span class="kw">diff</span> expected-b6.ppm output.ppm</code></pre></div>
+<p>Since these output files are binary, diff probably won't be able to show you where your output isn't exactly right. Using the Image Comparison program could help here, or looking at your actual and expected output using <code>hexdump -C</code>.</p>
+<h2 id="examining-your-output">Examining your Output</h2>
+<p>For some of the test cases, your output files will be so large it will be difficult to see where your program isn't exactly right. To help, we're providing a simple Java program called <a href="ImageComp.java" class="uri">ImageComp.java</a>. If you run this program with just one PPM file as a command-line argument, it will display just that image, magnified 2X. If you run it like the following, with two PPM files on the command line, it will let you look at each of the two files individually, along with a difference image, where any pixels that don't match between the images are colored in pink.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">java</span> ImageComp expected-t3.ppm output.ppm</code></pre></div>
+<p>The PPM image format is a little uncommon, but there are some image viewer programs that support it. Installing one of these can give you another way of looking at your program's output.</p>
+<p>If you are working on a common platform desktop machine (or probably any other Linux machine), you already have some programs you can use. Gimp and gthumb will display PPM images. Since <a href="http://www.gimp.org">gimp</a> is available for lots of platforms, that's an option even if you're not on a Linux machine. It also looks like <a href="http://www.libreoffice.org">LibreOffice</a> will open PPM files in the drawing program. On a Windows system, <a href="http://www.irfanview.com">IrfanView</a> is a small program that can view files in this format. We can add more viewing programs to this list if people report others they've had success with.</p>
+<h2 id="sample-input-files">Sample Input Files</h2>
+<p>Both the text-encoding and binary-encoding programs can be tested against the same input files. The starter includes the following test inputs, all named like input-x.txt.</p>
+<ol style="list-style-type: decimal">
+<li>A tiny little 4 X 4 image, where the triangle overlaps the two columns of pixels on the left.</li>
+<li>A tiny little 4 X 4 image, where the edge of the triangle goes down the diagonal.</li>
+<li>The same 10 x 10 image shown earlier in this assignment.</li>
+<li>A 10 x 10 image where the entire image is inside a big triangle.</li>
+<li>A 10 x 10 image with the entire triangle is off the edge of the image.</li>
+<li>A 100 x 100 image with a triangle that fits entirely on the image.</li>
+<li>A 100 x 80 image with a triangle that falls partially off the image.</li>
+<li>An invalid input, where one of the triangle vertices isn't a valid floating-point number.</li>
+<li>An invalid input, where the width of the image is negative.</li>
+</ol>
+<h1 id="grading">Grading</h1>
+<p>The grade for your program will depend mostly on how well it functions. We'll also expect your code to compile cleanly, to follow the style guide and to follow the expected design.</p>
+<ul>
+<li>Compiling cleanly on the common platform: <strong>10 points</strong></li>
+<li>Both versions of the program behave correctly on all tests: <strong>60 points</strong></li>
+<li>Source code follows the style guide: <strong>20 points</strong></li>
+<li>Deductions
+<ul>
+<li>Up to <strong>-50 percent</strong> for not following the required design.</li>
+<li>Up to <strong>-30 percent</strong> for failing to submit required files or submitting files with the wrong name.</li>
+<li>Up to <strong>-20 percent</strong> penalty for late submission.</li>
+</ul></li>
+</ul>
+<p><a name="started"></a></p>
+<h1 id="getting-started">Getting Started</h1>
+<p>To get started on this project, you'll need to clone your NCSU github repo and unpack the given starter into the p2 directory of your repo. You'll submit by checking files into your repo and pushing the changes back up to the NCSU github.</p>
+<h2 id="cloning-your-repository">Cloning your Repository</h2>
+<p>Everyone in CSC 230 has been assigned their own NCSU GitHub repository to be used during the semester. How do do you figure out what repo you've been assigned? Use a web browser to visit <code>github.ncsu.edu</code>. After authenticating, you should see a drop-down menu over on the left, probably with your unity ID on it. Select &quot;engr-csc230-spring2018&quot; from this drop-down and you should see a repo named something like &quot;engr-csc230-spring2018/csc230-???-??&quot; in the box labeled Repositories over on the right. The part at the end like &quot;csc230-???-??&quot; is your <em>repo_name</em> for this class.</p>
+<p>You will need to start by cloning this repository to somewhere in your your local AFS file space using the following commands, where <code>unity_id</code> is your unity ID, and <code>repo_name</code> is the repo you've been assigned.</p>
+<pre><code>$ unset SSH_ASKPASS
+$ git clone https://unity_id@github.ncsu.edu/engr-csc230-spring2018/repo_name.git</code></pre>
+<p>This will create a directory with your repo's name. If you <code>cd</code> into the directory, you should see directories for each of the projects for the class. You'll want to do your development for this assignment right under the <code>p2</code> directory. That's where we'll expect to find your project files when we're grading.</p>
+<h2 id="unpack-the-starter-into-your-cloned-repo">Unpack the starter into your cloned repo</h2>
+<p>Make sure you're in <code>p2</code> directory in your cloned repo. You will need to copy and unpack the project 2 starter. We're providing this file as a compressed tar archive, <a href="starter2.tgz" class="uri">starter2.tgz</a>. After you download this file, you can unpack its contents into your <code>p2</code> directory. You can do this like you unpacked the starter from project 1. If you are logged in on one of the common platform systems, you can save yourself a few steps by unpacking the starter directly from our official copy in AFS.</p>
+<pre><code>$ tar xzvpf /afs/eos.ncsu.edu/courses/csc/csc230/common/www/proj/p2/starter2.tgz</code></pre>
+<h2 id="instructions-for-submission">Instructions for Submission</h2>
+<p>If you've set up your repository properly, pushing your changes to your assigned CSC230 repository should be all that's required for submission. When you're done, we're expecting your repo to contain the following files. You can use the web interface on github.ncsu.edu to confirm that the right versions of all your files made it.</p>
+<ul>
+<li><code>triangle.c</code> : Source file, created by you.</li>
+<li><code>encoding.h</code> : Header file, provided with the starter and modified by you.</li>
+<li><code>text.c</code> : Source file, created by you.</li>
+<li><code>binary.c</code> : Source file, created by you.</li>
+<li><code>geometry.h</code> : Header file, provided with the starter and modified by you.</li>
+<li><code>geometry.c</code> : Source file, created by you.</li>
+<li><code>input-*.txt</code> : Test input files, provided with the starter.</li>
+<li><code>expected-t*.txt</code> : Expected text-encoding output files, provided with the starter.</li>
+<li><code>expected-b*.txt</code> : Expected binary-encoding output files, provided with the starter.</li>
+<li><code>test.sh</code> : test script, provided with the starter.</li>
+<li><code>.gitignore</code> : a file for this project, telling git what to <em>not</em> commit to the repo.</li>
+</ul>
+<h2 id="pushing-your-changes">Pushing your Changes</h2>
+<p>To submit your solution, you'll need to first commit your changes to your local, cloned copy of your repository. First, you need to add any new files you've created to the index. Running the following command will stage the current versions of a file in the index. Just replace the <code>some-file-name</code> with the name of the new file you want commit. You only need to do this once for each new file. The <code>-am</code> option used with the <code>commit</code> below will tell git to automatically commit modified files that are already being tracked.</p>
+<pre><code>$ git add some-file-name</code></pre>
+<p>When you're adding new files to your repo, you can use the shell wildcard character to match multiple, similar filenames. For example, the following will add all the input files to your repo.</p>
+<pre><code>$ git add input-*.txt</code></pre>
+<p>When you start your project, don't forget to add the <code>.gitignore</code> file to your repo. Since its name starts with a period, it's considered a hidden file. Commands like <code>ls</code> won't show this file automatically, so it might be easy to forget.</p>
+<pre><code>$ git add .gitignore</code></pre>
+<p>Before you commit, you may want to run the git status command. This will report on any files you are about to commit, along with other modified files that haven't been added to the index yet.</p>
+<pre><code>$ git status</code></pre>
+<p>Once you're ready to commit, run the following command to commit changes to your local repository. The <code>-am</code> option tells git to automatically commit any tracked files that have been modified (that's the <code>a</code> part of the option) and that you want to give a commit message right on the command line instead of starting up a text editor to write it (that's the <code>m</code> part of the option).</p>
+<pre><code>$ git commit -am &quot;&lt;a meaningful message about what you&#39;re committing&gt;&quot;</code></pre>
+<p><strong>Beware</strong>, you haven't actually submitted anything for grading yet. You've just put these changes in your local git repo. As with the clone command above, you may want to unset the <code>SSH_ASKPASS</code> variable before you run the push command. You should only need to do this once for each login session. To push changes up to your repo on github.ncsu.edu, you need to use the push command:</p>
+<pre><code>$ git push</code></pre>
+<p>Feel free to commit and push as often as you want. Whenever you've made a set of changes you're happy with, you can run the following to update your submission.</p>
+<pre><code>$ git add any-new-files
+$ git status
+$ git commit -am &quot;&lt;a meaningful message about what you&#39;re committing&gt;&quot;
+$ git push</code></pre>
+<h2 id="keeping-your-repo-clean">Keeping your repo clean</h2>
+<p>Be careful not to commit files that don't need to be part of your repo. Temporary files or files that can be easily re-generated will just take up space and obscure what's really changing as you modify your source code. And, the NCSU github site puts a file size limit on what you can push to your repo. Adding files you don't really need could create a problem for you later.</p>
+<p>The <code>.gitignore</code> file helps with this, but it's always a good idea to check with <code>git status</code> before you commit, to make sure you're getting what you expect.</p>
+<h2 id="checking-jenkins-feedback">Checking Jenkins Feedback</h2>
+<p>It will take me a few days to get our Jenkins systems working. Once they're set up, I'll send out a note on Piazza, and these instructions should work.</p>
+<p>We have created a <a
+href="http://go.ncsu.edu/jenkins-csc230">Jenkins</a> build job for you. Jenkins is a continuous integration server that is used by industry to automatically build and test application as they are being developed. We'll be doing the same thing with your project as you push changes to the NCSU github. This will provide early feedback on the quality of your work and your progress toward completing the assignment.</p>
+<p>The Jenkins job associated with your GitHub repository will poll GitHub every two minutes for changes. After you have pushed code to GitHub, Jenkins will notice the change and automatically start a build process on your code. The following actions will occur:</p>
+<ul>
+<li>Code will be pulled from your GitHub repository</li>
+<li>A testing script will be run to make sure you submitted all of the required files, to check your code against parts of the course style guidelines and to try out your solution on each of our provided test cases</li>
+</ul>
+<p>Jenkins will record the results of each execution. To obtain your Jenkins feedback, do the following tasks (remember, after a push, you may have to wait a couple of minutes for the latest results to appear):</p>
+<ul>
+<li>Go to <a href="http://go.ncsu.edu/jenkins-csc230">Jenkins</a> for CSC230. Your web browser will probably complain that this site doesn't have a valid certificate. That's OK. Tell your browser to make an exception for this site and it should let you continue to the site.</li>
+<li>You'll need to authenticate with your unity ID and password.</li>
+<li>Click the project named <em>p2-&lt;unityid&gt;</em></li>
+<li>There will be a table called <em>Build History</em> in the lower left, click the link for the latest build</li>
+<li>Click the <em>Console Output</em> link in the left menu (4th item)</li>
+<li>The console output provides the feedback from compiling your program and executing the provided test cases.</li>
+</ul>
+<h1 id="succeeding-on-project-2">Succeeding on Project 2</h1>
+<p>Be sure to follow the style guidelines and make sure your program compiles cleanly on the common platform with the required compile options. If you have your program producing the right output, it should be easy to clean up little problems with style or warnings from the compiler.</p>
+<p>Be sure your files are named correctly, including capitalization. We'll have to charge you a few points if you submit something with the wrong name, and we have to rename it to evaluate your work.</p>
+<p>There is a 24 hour window for <strong>late submissions</strong>. Use this if you need to, but try to keep all your points if you can. Getting started early can help you avoid this penalty.</p>
+<p><a name="outcomes"></a></p>
+<h1 id="learning-outcomes">Learning Outcomes</h1>
+<p>The syllabus lists a number of learning outcomes for this course. This assignment is intended to support several of theses:</p>
+<ul>
+<li><p>Write small to medium C programs having several separately-compiled modules</p></li>
+<li><p>Correctly identify error messages and warnings from the preprocessor, compiler, and linker, and avoid them.</p></li>
+<li><p>Interpret and explain data types, conversions between data types, and the possibility of overflow and underflow</p></li>
+<li><p>Use the C preprocessor to control tracing of programs, compilation for different systems, and write simple macros.</p></li>
+<li><p>Write, debug, and modify programs using library utilities, including, but not limited to assert, the math library, the string library, random number generation, variable number of parameters, standard I/O, and file I/O</p></li>
+<li><p>Use simple command-line tools to design, document, debug, and maintain their programs.</p></li>
+<li><p>Use an automatic packaging tool, such as make or ant, to distribute and maintain software that has multiple compilation units.</p></li>
+<li><p>Use a version control tools, such as subversion (svn) or git, to track changes and do parallel development of software.</p></li>
+<li><p>Distinguish key elements of the syntax (what's legal), semantics (what does it do), and pragmatics (how is it used) of a programming language.</p></li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,52 @@
+/** 
+  * @file triangle.c
+  * @author John Choi mchoi
+  * 
+  * This is the top-level, main component. It contains the main() function and is
+  * responsible for reading the input and looking for errors in the input. Then, it
+  * generates the output image, with help from the other two components.
+  * Above comment taken from the instruction.
+  */
+#include "geometry.h"
+#include "encoding.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+/**
+  * Main function that executes other functions in the project.
+  *
+  * @return EXIT_SUCCESS if the project compiles, executes, and exits correctly EXIT_FAILURE if it failes to read appropriate values
+  */
+int main() 
+{
+  int width, height;
+  double x1, y1, x2, y2, x3, y3;
+  int checker1, checker2, checker3;
+  int R, G, B;
+  checker1 = scanf("%d %d", &width, &height);
+  checker2 = scanf("%lf %lf %lf %lf %lf %lf", &x1, &y1, &x2, &y2, &x3, &y3);
+  checker3 = scanf("%d %d %d", &R, &G, &B);
+  if (checker1 != 2 || checker2 != 6 || checker3 != 3) {
+    return EXIT_FAILURE;
+  }
+  if (width < 0 || height < 0) {
+    return EXIT_FAILURE;
+  }
+  printHeader(width, height); //prints the 3 line header
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      if (inside(x1, y1, x2, y2, x3, y3, j + 0.5, i + 0.5)) {
+        printValue(R);
+        printValue(G);
+        printValue(B);
+      } else {
+        for (int i = 0; i < 3; i++) { //prints black 3 times if inside() returns false
+          printValue(0);
+        }
+      }
+    }
+  }
+  printf("\n"); // the last output line will end with a line terminator
+  return EXIT_SUCCESS;
+}
+
