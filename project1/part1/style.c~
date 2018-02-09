@@ -1,0 +1,71 @@
+/**
+ * @file style.c
+ * @author John Choi mchoi
+ *
+ * Practice for learning how to format a code correctly.
+ * Used Eclipse for correcting indentation.
+ */
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SEVENTY 72
+
+/**
+ * Method that prints random words.
+ *
+ * @param x integer to take in
+ */
+void printWord(int x) {
+  for (int i = 0; i < x; i++) {
+    // Print a random lower-case letter.
+    printf("%c", 97 + rand() % 26);
+  }
+}
+
+/**
+ * Method that prints lines.
+ * 
+ * @return count integer value
+ */
+int printLine() {
+  int count = 0, pos = 0, space = 0;
+  int len = 1 + rand() % 10;
+  // Print a line of words up to a limited length.
+  while (pos + len + space < SEVENTY) {
+    if (space > 0) {
+      printf(" ");
+    }
+    printWord(len);
+    pos += len + space;
+    len = 1 + rand() % 10;
+    space = 1;
+    count += 1;
+  }
+  printf("\n");
+  return count;
+}
+
+/**
+ * Method that prints paragraph.
+ * 
+ * @param n number of paragraph to print
+ * @return total printline method results
+ */
+int printParagraph(int n) {
+  int total = 0;
+  for (int i = 0; i < n; i++) {
+    total += printLine();
+  }
+  return total;
+}
+
+/**
+ * Main method that executes methods.
+ * 
+ * @return EXIT_SUCCESS if program exits successfully
+ */
+int main() {
+  int w = printParagraph(10);
+  printf("Words: %d\n", w);
+  return EXIT_SUCCESS;
+}

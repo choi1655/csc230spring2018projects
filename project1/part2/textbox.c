@@ -1,0 +1,88 @@
+/**
+  * @file textbox.c 
+  * @author John Choi mchoi
+  * 
+  * Project 1 part 2. 
+  * Prints a border on all 4 sides of the input text file.
+  * Limits each line to 60 characters.
+  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+/** Width of each line of text in the box. */
+#define LINE_WIDTH 60
+
+/** Symbol used to draw the border around the box. */
+#define BORDER '*'
+
+/**
+  * This function will read and print a single line of text inside the border.
+  * If there's no line of text to print (i.e., it hits EOF before it can read any
+  * characters), it will return false to tell the caller that there's no more text to
+  * put in the box. This function will read the text from standard input and print to
+  * standard output. If the line of text isn't long enough, it will add extra spaces at
+  * the end to make the box rectangular. If a line of text is too long, it will discard
+  * extra characters on the line (i.e., up to the end-of-line) to keep the box
+  * rectangular.
+  * Above quoted from the instructions.
+  *
+  * @return false if there is no more text to put in the box
+  */
+bool paddedLine() 
+{
+  int counter = 0;
+  int ch = getchar();
+  if (ch == EOF) {
+    return false;
+  }
+  printf("%c", BORDER);
+  while (ch != '\n' && ch != EOF) {
+    if (counter < LINE_WIDTH) {
+      putchar(ch);
+    }
+    ch = getchar();
+    counter++;
+  }
+  if (counter < LINE_WIDTH && ch == '\n') { //puts space if line is too short
+    for (int i = counter; i < LINE_WIDTH; i++) {
+      putchar(' ');
+    }
+  }
+  printf("%c\n", BORDER);
+  return true;
+}
+
+/**
+  * This function prints out multiple copies of the given character, 
+  * followed by a newline. The number of copies is determined by the count parameter. 
+  * Use this function to help print the top and bottom border around the text.
+  * Above quoted from the instructions.
+  * 
+  * @param ch character to print
+  * @param count number of times to print the given character
+  */
+void lineOfChars(char ch, int count) 
+{
+  for (int i = 0; i < count; i++) {
+    printf("%c", ch);
+  }
+  printf("\n");
+}
+
+/**
+  * Executes the other functions in this program.
+  * 
+  * @return EXIT_SUCCESS if the program runs successfully
+  */
+int main() 
+{
+  lineOfChars(BORDER, 62);
+  bool isTrue = true;
+  while (isTrue) {
+    isTrue = paddedLine();
+  }
+  lineOfChars(BORDER, 62);
+  return EXIT_SUCCESS;
+}
+
