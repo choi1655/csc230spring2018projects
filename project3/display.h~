@@ -1,0 +1,47 @@
+/**
+  * @file display.h
+  * @author John Choi mchoi
+  * 
+  * Provides prototypes for the functions and variables
+  */
+
+extern char avail[26];
+
+/**
+  * This is part of the display component. It will print the characters 
+  * in the "word", some or all of which may be underscores, to standard output,
+  * with a single space between each character and no space after the
+  * last character.
+  *
+  * @param word array of words 
+  */
+void displayWord(char word[]);
+
+/**
+  * Removes and prints alphabets.
+  *
+  * @param idx character to remove
+  */
+void printChars(int idx);
+
+/**
+  * Initializes the array with every single alphabets.
+  */
+void initializeChars();
+
+/** 
+  * This is part of the display component. It will output the stick figure
+  * below with the given number of body parts. The head is the first part
+  * to be drawn and is represented by an uppercase O. If the number of parts
+  * is 2, the head and the torso top should be drawn; if the number of parts
+  * is 3, the head, torso top, and torso bottom should be drawn, etc. See
+  * the requirements for the order in which the body parts are added
+  * to the figure, which corresponds to the number of parts passed to
+  * the method. 
+  * Above taken from the instruction.
+  * Think switch statement to do this.
+  *
+  * @param numberOfParts 
+  */
+void displayFigure(int numberOfParts);
+

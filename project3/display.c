@@ -1,0 +1,120 @@
+/**
+  * @file display.c
+  * @author John Choi mchoi
+  *
+  * This component defines function for displaying the word being
+  * guessed and the stick figure.
+  * Above taken from the instruction.
+  */
+
+#include "display.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char avail[27];
+
+/**
+  * Initializes the array of every single alphabets.
+  */
+void initializeChars() 
+{
+  for (int i = 97; i <= 122; i++) { //initializes the available character array
+    avail[i - 97] = i;
+  }
+  avail[26] = '\0';
+}
+
+/**
+  * It will print the characters in the "word", some or all of which
+  * may be underscores, to standard output, with a single space between
+  * each character and no space after the last character.
+  * Above taken from the instruction.
+  * Implemented on 02142018.
+  * 
+  * @param word array of words
+  */
+void displayWord(char word[])
+{
+  int size = sizeof(word) / sizeof(word[0]);
+  for (int i = 0; i < size; i++) {
+    if (i == size - 1) {
+      printf("%c\n", word[i]);
+    } else {
+      printf("%c ", word[i]);
+    }
+  }
+}
+
+/**
+  * Replaces and prints the array of alphabets without the astricks.
+  *
+  * @param idx character to replace with astricks
+  */
+void printChars(int idx)
+{
+  char *pAvail = avail;
+  *(pAvail + (idx - 97)) = '*';
+  printf("Remaining letter:");
+  for (int i = 0; i < 26; i++) { // prints everything except the replaced character
+    if (avail[i] == '*') {
+      continue;
+    }
+    printf(" %c\n", avail[i]);
+  }
+}
+
+/**
+  * It will output the stick figure below with the given number of body parts.
+  * The head is the first part to be drawn and is represented by an
+  * uppercase O. If the number of parts is 2, the head and the torso top
+  * should be drawn; if the number of parts is 3, the head, torso top,
+  * and torso bottom should be drawn, etc. See the requirements for the
+  * order in which the body parts are added to the figure, which 
+  * corresponds to the number of parts passed to the method.
+  * Above taken from the instructions.
+  * 
+  * @param numberOfParts number of stickmans body parts to be drawn
+  */
+void displayFigure(int numberOfParts) 
+{
+  switch (numberOfParts) {
+    case 1 : 
+      printf(" O \n");
+      break;
+    case 2 : 
+      printf(" O \n");
+      printf(" | \n");
+      break;
+    case 3 : 
+      printf(" O \n");
+      printf(" | \n");
+      printf(" | \n");
+      break;
+    case 4 : 
+      printf(" O \n");
+      printf("/| \n");
+      printf(" | \n");
+      break;
+    case 5 : 
+      printf(" O \n");
+      printf("/|\\n");
+      printf(" | \n");
+      break;
+    case 6 : 
+      printf(" O\n");
+      printf("/|\\n");
+      printf(" | \n");
+      printf("/\n");
+      break;
+    case 7 :
+      printf(" O \n");
+      printf("/|\\n");
+      printf(" | \n");
+      printf("/ \\n");
+      break;
+    default :
+      printf("Number has to be between 1 and 7 inclusive.\n");
+  }
+}
+
