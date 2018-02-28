@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-//TODO check to see if length of word goes over 20
 
 /**
   * It will read the words in the file and store them in the words array.
@@ -24,10 +23,14 @@ void readWords(char const * filename)
   int ch;
   int i;
   bool breakIt = false; //to break out of nested for loops
-  bool triggerLimit = false;
   for (i = 0; i < 50 && !breakIt; i++) {
     for (int j = 0; j < 20; j++) {
       ch = fgetc(wordtextfile);
+      if (!(ch >= 'a' && ch <= 'z') && ch != '\n' && ch != EOF) {
+        fprintf(stderr, "Textfile contains invalid character\n");
+        fclose(wordtextfile);
+        exit(EXIT_FAILURE);
+      }
       if (ch == '\n') {
         break;
       }
@@ -40,10 +43,29 @@ void readWords(char const * filename)
     }
   }
   if (wordCount > 50) { // exits the program with failure code if the word count is > 50
-    fprintf(stderr, "Invalid word file");
+    fprintf(stderr, "Invalid word file\n");
     fclose(wordtextfile);
     exit(EXIT_FAILURE);
   }
-  fclose(wordtextfile);
+  char currentWord[20];
+  bool nullExists = true;
+  for (int i = 0; i < wordCount && nullExists; i++) {
+    for (int j = 0; j < 20 && nullExists; j++) {
+      currentWord[i] = words[i][j];
+      for (int k = 0; k < 20; k++) {
+        nullExists = false;
+        if (currentWord[k] == '\0') {
+          nullExists = true;
+          break;
+        }
+      }
+    }
+  }
+  if (!nullExists) {
+    fprintf(stderr, "Invalid word file. Goes over 20.\n");
+    fclose(wordtextfile);
+    exit(EXIT_FAILURE);
+  }
+  //fclose(wordtextfile);
 }
 

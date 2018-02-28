@@ -17,6 +17,7 @@
 #include <string.h>
 #include <time.h>
 
+//TODO check for duplicates
 /** Two dimensional array used to store the word list */
 int words[50][20];
 /** Word count used to count the numbers stored. */
@@ -27,28 +28,27 @@ int wordCount;
   * @param len length of wordsToDisplay
   * @param a 
   */
-char * underscoreToLetter(char *arr, int len, char a)
+void underscoreToLetter(char *selectedWord, char *wordToDisplay, int len, char input)
 {
   for (int i = 0; i < len; i++) {
-    if (*(arr + i) == a) {
-      *arr == a;
+    if (selectedWord[i] == input) {
+      *(wordToDisplay + i) = input;
     }
   }
-  return arr;
 }
 
 /**
   * Takes in the word to compare and returns true if the character exists.
   *
-  * @param arr word to comapre
+  * @param selectedWord word to comapre
   * @param len length of the word
   * @param a character to check
   * @return true if character exists
   */
-bool contains(char *arr, int len, char a)
+bool contains(char *selectedWord, int len, char a)
 {
   for (int i = 0; i < len; i++) {
-    if (*(arr + i) == a) {
+    if (*(selectedWord + i) == a) {
       return true;
     }
   }
@@ -73,13 +73,17 @@ void playGame()
   char input;
   char wordToDisplay[selectedWordSize + 1];
   char *pWordToDisplay = wordToDisplay;
-  for (int i = 0; i < selectedWordSize + 1; i++) {
+  for (int i = 0; i < selectedWordSize; i++) {
     *(pWordToDisplay + i) = '_'; // initializes word to underscores
   }
+  *(pWordToDisplay + (selectedWordSize + 1)) = '\0';
   
   //actual game runs from here
+  printf("Word chosen for debug: %s\n", selectedWord); //TODO delete this later
   displayWord(wordToDisplay);
   printChars(0);
+  
+  
   while (maxTimesIncorrect != 7) {
     printf("letter> ");
     if (scanf("%c", &input) != 1) { //if invalid input, re-run the loop
@@ -88,22 +92,29 @@ void playGame()
     } else if (input == EOF) {
       exit(EXIT_SUCCESS); // exit the program if user inputs EOF
     }
-    //TODO calls display components repeatedly
+    printf("\n");
+    printf("Input for debug: %c\n", input); //TODO delete this later
     letterIsTrue = contains(selectedWord, selectedWordSize, input);
+    
+    
     if (!letterIsTrue) { //if input letter was wrong
       maxTimesIncorrect++;
       displayFigure(maxTimesIncorrect);//passes in maxTimesIncorrect to display stick figure
       displayWord(wordToDisplay);
+      
+      
+      
     } else {  //if input letter was correct
-      //TODO need something replaces underscore characters in string
+      underscoreToLetter(selectedWord, wordToDisplay, selectedWordSize, input);
       numberTimesCorrect++;
+      displayWord(wordToDisplay);
       if (numberTimesCorrect == selectedWordSize) { // if correct word reached terminate loop
         fprintf(stdout, "You win!\n\n");
         break;
       }
     }
     printChars(input);
-  }
+  } //end of while loop
   
   
   if (maxTimesIncorrect == 7) {
@@ -131,18 +142,6 @@ int main(int argc, char *argv[])
     fclose(stream);
     return EXIT_FAILURE;
   }
-  int current = fgetc(stream);
-  /**
-    * Check to see if there's any capital letters in the text file
-    */
-  while (current != EOF) {
-    if (!(current >= 'a' && current <= 'z')) {
-      fprintf(stderr, "Invalid word file");
-      fclose(stream);
-      return EXIT_FAILURE; // exit with code 1 if a character is capitalized
-    }
-    current = getchar();
-  }
   if (argc > 2) {
     seedNum = atoi(argv[2]); //optional seed number
     if (seedNum < 0) {
@@ -162,6 +161,7 @@ int main(int argc, char *argv[])
   char response;
   printf("Play again(y,n)> ");
   scanf("%c", &response);
+  printf("\n");
   if (response == EOF) {
     return EXIT_SUCCESS; //Exit the program successfully if user inputs EOF
   }
@@ -169,6 +169,7 @@ int main(int argc, char *argv[])
     playGame();
     printf("Play again(y,n)> ");
     scanf("%c", &response);
+    printf("\n");
     if (response == EOF) {
       return EXIT_SUCCESS; // exit the program successfully if user inputs EOF
     }
