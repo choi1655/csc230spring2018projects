@@ -36,7 +36,7 @@ void initializeChars()
   */
 void displayWord(char word[])
 {
-  int size = sizeof(word) / sizeof(word[0]);
+  int size = strlen(word);
   for (int i = 0; i < size; i++) {
     if (i == size - 1) {
       printf("%c\n\n", word[i]);
@@ -81,38 +81,38 @@ void displayFigure(int numberOfParts)
 {
   switch (numberOfParts) {
     case 1 : 
-      printf(" O \n");
+      printf(" O \n\n");
       break;
     case 2 : 
       printf(" O \n");
-      printf(" | \n");
+      printf(" | \n\n");
       break;
     case 3 : 
       printf(" O \n");
       printf(" | \n");
-      printf(" | \n");
+      printf(" | \n\n");
       break;
     case 4 : 
       printf(" O \n");
       printf("/| \n");
-      printf(" | \n");
+      printf(" | \n\n");
       break;
     case 5 : 
       printf(" O \n");
       printf("/|\\\n");
-      printf(" | \n");
+      printf(" | \n\n");
       break;
     case 6 : 
-      printf(" O\n");
+      printf(" O \n");
       printf("/|\\\n");
       printf(" | \n");
-      printf("/\n");
+      printf("/\n\n");
       break;
     case 7 :
       printf(" O \n");
       printf("/|\\\n");
       printf(" | \n");
-      printf("/ \\\n");
+      printf("/ \\\n\n");
       break;
     default :
       printf("Number has to be between 1 and 7 inclusive.\n");

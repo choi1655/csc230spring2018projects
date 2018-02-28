@@ -17,16 +17,38 @@
 #include <string.h>
 #include <time.h>
 
-//TODO check for duplicates
 /** Two dimensional array used to store the word list */
-int words[50][20];
+char words[50][20];
 /** Word count used to count the numbers stored. */
 int wordCount;
+/** Stores used letters */
+char usedLetters[7];
 
 /**
-  * @param arr takes in wordsToDisplay
-  * @param len length of wordsToDisplay
-  * @param a 
+  * Returns true if the letter has been used.
+  *
+  * @param entered array of used letters
+  * @letter letter to check
+  * @return true if duplicate
+  */
+bool isDuplicate(char letter)
+{
+  for (int i = 0; i < 7; i++) {
+    if (usedLetters[i] == letter) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+  * Called when user enters the correct letter.
+  * Replaces underscores with correct input letter.
+  *
+  * @param selectedWord takes in selected word
+  * @param wordToDisplay takes in word to display
+  * @param len takes in length of the word
+  * @param input takes in user input
   */
 void underscoreToLetter(char *selectedWord, char *wordToDisplay, int len, char input)
 {
@@ -38,9 +60,25 @@ void underscoreToLetter(char *selectedWord, char *wordToDisplay, int len, char i
 }
 
 /**
+  * Returns the number of underscores left.
+  * @param wordToDisplay string with underscore
+  * @return counter number of underscores left
+  */
+int numberOfUnderscores(char *wordToDisplay)
+{
+  int counter = 0;
+  for (int i = 0; i < strlen(wordToDisplay); i++) {
+    if (*(wordToDisplay + i) == '_') {
+      counter++;
+    }
+  }
+  return counter;
+}
+
+/**
   * Takes in the word to compare and returns true if the character exists.
   *
-  * @param selectedWord word to comapre
+  * @param selectedWord word to compare
   * @param len length of the word
   * @param a character to check
   * @return true if character exists
@@ -70,56 +108,76 @@ void playGame()
     selectedWord[i] = words[index][i];
   }
   int selectedWordSize = strlen(selectedWord); //from string.h returns words size
+  char inputString[100];
   char input;
+  int counter = 0;
   char wordToDisplay[selectedWordSize + 1];
   char *pWordToDisplay = wordToDisplay;
   for (int i = 0; i < selectedWordSize; i++) {
     *(pWordToDisplay + i) = '_'; // initializes word to underscores
   }
-  *(pWordToDisplay + (selectedWordSize + 1)) = '\0';
+  *(pWordToDisplay + (selectedWordSize)) = '\0';
   
   //actual game runs from here
-  printf("Word chosen for debug: %s\n", selectedWord); //TODO delete this later
+  //printf("Word chosen for debug: %s\n", selectedWord); //TODO delete this later
+  printf("\n");
   displayWord(wordToDisplay);
   printChars(0);
-  
+  numberTimesCorrect = numberOfUnderscores(wordToDisplay);
   
   while (maxTimesIncorrect != 7) {
     printf("letter> ");
-    if (fscanf(stdin, "%c", &input) != 1) { //if invalid input, re-run the loop
-      printf("Invalid letter\n");
-      continue;
-    } else if (input == EOF) {
-      exit(EXIT_SUCCESS); // exit the program if user inputs EOF
+    if (fscanf(stdin, "%s", inputString) == EOF) {
+      exit(EXIT_SUCCESS);
     }
+    if (strlen(inputString) != 1) { //if invalid input, re-run the loop
+      printf("\nInvalid letter\n\n");
+      continue;
+    } else if (isDuplicate(inputString[0])) { //checks for duplicate
+      printf("\nInvalid letter\n\n");
+      continue;
+    }
+    input = inputString[0];
+    if (!(input >= 'a' && input <= 'z')) {
+      printf("\nInvalid letter\n\n");
+      continue;
+    }
+    fscanf(stdin, "%*c"); //frees the buffer
     printf("\n");
-    printf("Input for debug: %c\n", input); //TODO delete this later
     letterIsTrue = contains(selectedWord, selectedWordSize, input);
-    
+    numberTimesCorrect = numberOfUnderscores(wordToDisplay);
     
     if (!letterIsTrue) { //if input letter was wrong
       maxTimesIncorrect++;
       displayFigure(maxTimesIncorrect);//passes in maxTimesIncorrect to display stick figure
-      displayWord(wordToDisplay);
+      //displayWord(wordToDisplay);
       
       
       
     } else {  //if input letter was correct
       underscoreToLetter(selectedWord, wordToDisplay, selectedWordSize, input);
-      numberTimesCorrect++;
-      displayWord(wordToDisplay);
-      if (numberTimesCorrect == selectedWordSize) { // if correct word reached terminate loop
+      numberTimesCorrect--;
+      //displayWord(wordToDisplay);
+      if (numberTimesCorrect == 0) { // if correct word reached terminate loop
+        displayWord(wordToDisplay);
         fprintf(stdout, "You win!\n\n");
         break;
       }
     }
+    if (maxTimesIncorrect == 7) {
+      fprintf(stdout, "You lose!\nWord was %s\n\n", selectedWord);
+      break;
+    }
+    displayWord(wordToDisplay);
     printChars(input);
+    usedLetters[counter] = input;
+    counter++;
   } //end of while loop
   
   
-  if (maxTimesIncorrect == 7) {
+  /*if (maxTimesIncorrect == 7) {
     fprintf(stdout, "You lose!\nWord was %s\n\n", selectedWord);
-  }
+  }*/
 }
 
 /**
@@ -132,9 +190,14 @@ void playGame()
 int main(int argc, char *argv[]) 
 {
   int seedNum;
+  if (argc < 2) {
+    fprintf(stderr, "usage: hangman <word-file> [seed]\n");
+    return EXIT_FAILURE;
+  }
   FILE *stream = fopen(argv[1], "r"); // opens the file to read
   if (!stream) { // checks to see if the file can be opened
     fprintf(stderr, "Can't open word file\n");
+    //fclose(stream);
     return EXIT_FAILURE;
   }
   if (argc > 3) { //checks the number of arguments passed in
@@ -158,19 +221,17 @@ int main(int argc, char *argv[])
   
   playGame();
   
-  char response;
+  char response[10];
   printf("Play again(y,n)> ");
-  fscanf(stdin, "%c", &response);
-  printf("\n");
-  if (response == EOF) {
+  //printf("\n");
+  if (fscanf(stdin, "%s", response) == EOF) {
     return EXIT_SUCCESS; //Exit the program successfully if user inputs EOF
   }
-  while (response == 'y' && response == 'Y') {
+  while (response[0] == 'y' || response[0] == 'Y') {
     playGame();
     printf("Play again(y,n)> ");
-    fscanf(stdin, "%c", &response);
-    printf("\n");
-    if (response == EOF) {
+    //printf("\n");
+    if (fscanf(stdin, "%s", response) == EOF) {
       return EXIT_SUCCESS; // exit the program successfully if user inputs EOF
     }
   }
