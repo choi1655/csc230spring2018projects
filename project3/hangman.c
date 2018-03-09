@@ -119,7 +119,7 @@ void playGame()
   *(pWordToDisplay + (selectedWordSize)) = '\0';
   
   //actual game runs from here
-  //printf("Word chosen for debug: %s\n", selectedWord); //TODO delete this later
+  printf("Word chosen for debug: %s\n", selectedWord); //TODO delete this later
   printf("\n");
   displayWord(wordToDisplay);
   printChars(0);

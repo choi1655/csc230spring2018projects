@@ -190,12 +190,11 @@ void playGame()
 int main(int argc, char *argv[]) 
 {
   int seedNum;
-  FILE *stream = fopen(argv[1], "r"); // opens the file to read
   if (argc < 2) {
     fprintf(stderr, "usage: hangman <word-file> [seed]\n");
-    fclose(stream);
     return EXIT_FAILURE;
   }
+  FILE *stream = fopen(argv[1], "r"); // opens the file to read
   if (!stream) { // checks to see if the file can be opened
     fprintf(stderr, "Can't open word file\n");
     //fclose(stream);
