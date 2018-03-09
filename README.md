@@ -2,28 +2,16 @@
 
 This README would normally document whatever steps are necessary to get your application up and running.
 
-### What is this repository for? ###
+### Hangman game for NCSU CSC230-001 Project 3 ###
 
-* Quick summary
-* Version 02092018
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* Runnable via Unix terminal
+* Last updated: 02092018
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
+* From Unix terminal:
+* ./hangman <wordfile> <optional seed number>
 * Dependencies
 * Database configuration
 * How to run tests
 * Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
