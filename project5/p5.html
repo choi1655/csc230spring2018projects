@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>CSC230 Project 5 - </title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="./style.css" type="text/css" />
+</head>
+<body>
+<h1 id="csc-230-project-5">CSC 230 Project 5</h1>
+<h1 id="huffman-coding">Huffman Coding</h1>
+<p>For this Project, you will write a pair of programs that work together, one called <code>encode</code> and the other called <code>decode</code>. The first program uses <a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman coding</a> to &quot;encode&quot; a file, and in so doing compress it. &quot;Decoding&quot; the encoded file converts it back into the original file. The Huffman coding algorithm creates a bit string to represent each unique character in a document based on its frequency, with shorter strings used to encode characters that occur more frequently. These bit strings are &quot;prefix codes&quot; in that the bit string used to encode a given character is not used as the first part of the bit string for any other character.</p>
+<p>For example, if the letters, <code>a</code>, <code>c</code>, and <code>t</code>, are represented by the bit strings, <code>0000</code>, <code>00101</code>, and <code>1111</code>, respectively, the word <code>act</code> can be encoded as <code>0000001011111</code>. This encoding would only require 2 bytes instead of the 3 bytes required when using ASCII characters. Decoding the string involves matching the sequences of bits in the string to the codes for the letters. Starting at the beginning of the bit string, the sequences, <code>0</code>, <code>00</code>, and <code>000</code> do not match any letter, but <code>0000</code> matches an <code>a</code>. Likewise, the following bit sequences <code>0</code>, <code>00</code>, <code>001</code>, and <code>0010</code> do not match any letter, but <code>00101</code> matches a <code>c</code>. Finally, the last sequence <code>1111</code> matches a <code>t</code>.</p>
+<p>You will use the programs as follows, where codes-1.txt is a list of prefix codes for each letter of the alphabet as well as space, newline, and eof, input-1.txt is a file to be encoded, and encoded-1.bin is the encoded (binary) version of the file.</p>
+<pre><code># encode input-1.txt using codes-1.txt
+$ ./encode codes-1.txt input-1.txt encoded-1.bin 
+# decode, to get back a copy of the original.
+$ ./decode codes-1.txt encoded-1.bin output.txt
+# See if it looks exactly like the original
+$ diff output.txt input-1.txt</code></pre>
+<p>As with recent assignments, you'll be developing this project using git for revision control. You should be able to just unpack the starter into the p5 directory of your cloned repo to get started. See the <a href="#started">Getting Started</a> section for instructions.</p>
+<p>This Project supports a number of our course objectives. See the <a href="#outcomes">Learning Outcomes</a> section for a list.</p>
+<h2 id="rules-for-project-5">Rules for Project 5</h2>
+<p>You get to complete this project individually. If you're unsure what's permitted, you can have a look at the academic integrity guidelines in the course syllabus.</p>
+<p>In the design section, you'll see some instructions for how your implementation is expected to work. Be sure you follow these rules. It's not enough to just turn in a working program; your program has to follow the design constraints we've asked you to follow. For this project, we're putting some constraints on the functions you'll need to define, and on one data structure you'll need to use. Still, you will have lots of opportunities to design parts of the project for yourself.</p>
+<h1 id="requirements">Requirements</h1>
+<p>This section says what your programs are supposed to be able to do, and what they should do when something goes wrong.</p>
+<h2 id="running-the-encode-decode-programs">Running the encode / decode programs</h2>
+<p>The <code>encode</code> program and the <code>decode</code> program both take three command-line arguments, a file with prefix codes, an input file, and an output file.</p>
+<p>Running <code>encode</code>, as follows will get it to read input from the file <code>input.txt</code> and use codes.txt to create and output an encoded representation to the file <code>encoded.bin</code>.</p>
+<pre><code>./encode codes.txt input.txt encoded.bin</code></pre>
+<p>If you give it the wrong number of command-line arguments, it should print this usage message to standard error and exit with a status of 1:</p>
+<pre><code>usage: encode &lt;codes-file&gt; &lt;infile&gt; &lt;outfile&gt;</code></pre>
+<p>If the codes-file contains any symbols other than the lowercase letters, &quot;space&quot;, &quot;newline&quot;, and &quot;eof&quot;, or codes that are longer that 12 characters or contain characters other than 0 and 1, or does not contain a code for each lowercase letter, &quot;space&quot;, &quot;newline&quot;, and &quot;eof&quot;, it should print this error message to standard error and exit with a status of 1.</p>
+<pre><code>Invalid code file</code></pre>
+<p>If the input file contains any characters other than lowercase letters, spaces, and newlines, it should print this error message to standard error and exit with a status of 1.</p>
+<pre><code>Invalid input file</code></pre>
+<p>Running <code>decode</code>, as follows will get it to read an encoded representation from the file <code>encoded.bin</code>, decode it using codes.txt, and output the result to <code>output.txt</code>.</p>
+<pre><code>./decode codes.txt encoded.bin output.txt</code></pre>
+<p>If it's successful, running the two programs like this should produce an output file, <code>output.txt</code> that exactly matches the original input, <code>input.txt</code>.</p>
+<p>If you run <code>decode</code> with the wrong number of command-line arguments, it will print the following usage message to standard error and exit with a status of 1:</p>
+<pre><code>usage: decode &lt;codes-file&gt; &lt;infile&gt; &lt;outfile&gt;</code></pre>
+<p>If the codes-file contains any symbols other than the lowercase letters, &quot;space&quot;, &quot;newline&quot;, and &quot;eof&quot;, or codes that are longer that 12 characters or contain characters other than 0 and 1, or does not contain a code for each lowercase letter, &quot;space&quot;, &quot;newline&quot;, and &quot;eof&quot;, it should print this error message to standard error and exit with a status of 1.</p>
+<p>If the encoded input file contains anything other than a sequence of valid prefix codes, as described in the next section, followed by zero or more 0 bits, it should print this error message to standard error and exit with a status of 1.</p>
+<pre><code>Invalid input file</code></pre>
+<p>If either program can't open one of the given files (e.g., <code>file.txt</code>), it will report an error message like the following to standard error. Here, this is the error message reported by <code>perror()</code>, given the filename that couldn't be opened, so it may vary depending on what went wrong. After printing the error message, the program should exit with a status of 1:</p>
+<pre><code>file.txt: No such file or directory</code></pre>
+<h2 id="symbol-byte-encoding">Symbol / Byte Encoding</h2>
+<p>The <code>encode</code> program will encode a file consisting of lowercase letters, spaces, and newlines by representing each symbol (character) with a binary prefix code based on Huffman coding. Two different files containing prefix codes for each letter of the alphabet as well as space, newline, and eof are provided for you, <a href="codes-1.txt">codes-1.txt</a> and <a href="codes-2.txt">codes-2.txt</a>. It may be interesting to see which set of codes creates a smaller encoded version of a given file. These files are based on the tables found at <a href="http://slideplayer.com/slide/6184217/18/images/52/Huffman+code+for+English+alphabet.jpg">http://slideplayer.com/slide/6184217/18/images/52/Huffman+code+for+English+alphabet.jpg</a> and <a href="http://www.yorku.ca/mack/uist2011-f2.jpg">http://www.yorku.ca/mack/uist2011-f2.jpg</a>, respectively.</p>
+<!--table border="0">
+<tr><th>Symbol</th> <th>Code</th></tr>
+<tr><td>'A'</td> <td style="text-align:right">  10 1100</td></tr>
+<tr><td>'B'</td> <td style="text-align:right"> 11 0101 0100</td></tr>
+<tr><td>'C'</td> <td style="text-align:right">110 1011 0100 </td></tr>
+<tr><td>'D'</td> <td style="text-align:right">1101 0100</td></tr>
+<tr><td>'E'</td> <td style="text-align:right">100</td></tr>
+<tr><td>'F'</td> <td style="text-align:right">10 1011 0100</td></tr>
+<tr><td>'G'</td> <td style="text-align:right">1 1011 0100</td></tr>
+<tr><td>'H'</td> <td style="text-align:right">1 0101 0100</td></tr>
+<tr><td>'I'</td> <td style="text-align:right">1 0100</td></tr>
+<tr><td>'J'</td> <td style="text-align:right">1011 0110 1100</td></tr>
+<tr><td>'K'</td> <td style="text-align:right">1 1010 1100</td></tr>
+<tr><td>'L'</td> <td style="text-align:right">10 1101 0100</td></tr>
+<tr><td>'M'</td> <td style="text-align:right">110 1100</td></tr>
+<tr><td>'N'</td> <td style="text-align:right">11 0100</td></tr>
+<tr><td>'O'</td> <td style="text-align:right">11 0110 1100</td></tr>
+<tr><td>'P'</td> <td style="text-align:right">101 1011 0100</td></tr>
+<tr><td>'Q'</td> <td style="text-align:right">1101 1010 1100</td></tr>
+<tr><td>'R'</td> <td style="text-align:right">1011 0100</td></tr>
+<tr><td>'S'</td> <td style="text-align:right">101 0100</td></tr>
+<tr><td>'T'</td> <td style="text-align:right">1100</td></tr>
+<tr><td>'U'</td> <td style="text-align:right">1010 1100</td></tr>
+<tr><td>'V'</td> <td style="text-align:right">10 1010 1100</td></tr>
+<tr><td>'W'</td> <td style="text-align:right">1 0110 1100</td></tr>
+<tr><td>'X'</td> <td style="text-align:right">110 1010 1100</td></tr>
+<tr><td>'Y'</td> <td style="text-align:right">1101 0110 1100</td></tr>
+<tr><td>'Z'</td> <td style="text-align:right">110 1101 0100</td></tr>
+<tr><td>' ' (space)</td> <td style="text-align:right">101 1010 1100</td></tr>
+<tr><td>'\\n' (newline)</td> <td style="text-align:right">101 0110 1100</td></tr>
+</table-->
+
+
+<h2 id="encoded-file-representation">Encoded File Representation</h2>
+<p>An encoded file should consist of codes for each character in the input file with a special code to mark the end of the file. If the last byte of the encoded file is not full, the unused bits should be filled with 0's.</p>
+<p>The following figure shows what test input, <code>input-1.txt</code>, would look like when encoded. The <code>input-1.txt</code> file contains the symbol <code>g</code>, followed by <code>o</code>, followed by a newline. Each row in this figure shows all 8 bits in a byte of the encoded file, with the high-order bit on the left (like you'd normally expect) and the low-order one on the right. The encoded file contains the code 6-bit code, <code>001001</code>, for <code>g</code>, followed by the 4-bit code, <code>1011</code>, for <code>o</code>, followed by the 11-bit code, <code>11010000110</code>, for the newline, followed by the 11-bit code, <code>11010000111</code>, for eof. This encoding fits perfectly into 4 bytes. If there had been any unused bits, they would be filled with 0s.</p>
+<div class="figure">
+<img src="figure4.png" alt="Encoded representation for input-1.txt" /><p class="caption">Encoded representation for input-1.txt</p>
+</div>
+<p>In this case, all of these codes fit in a 4-byte output file. The code for <code>g</code> is stored in the 6 high-order bits of the first byte, leaving 2 bits to store the start of the code for the <code>o</code>. The remaining 2 bits of the code for <code>o</code> are stored in the 2 high-order bits of the next byte. Then, the remaining 6 bits are used to store the first part of the 11-bit code for the newline. The remaining 5 bits of the code for the newline go in the 5 high-order bits of the next byte which leave 3 bits for the first part of the 11-bit code for eof. The remaining 8 bits of the code for eof fill the next byte.</p>
+<p>Like this example shows, bits in the output file will be used starting with the high-order bits and going toward the low-order bits. The highest-order bits of a code will be written first, going in the next available bit in the current byte of the file. Once all the bits of a byte are used, we'll start using bits of the next byte, starting with the high-order ones. This may leave some lower-order bits in the last byte unused. You'll just fill these with zeros.</p>
+<h2 id="design">Design</h2>
+<h3 id="binary-io">Binary I/O</h3>
+<p>The encode program will read a text file and create a binary file while the decode program will read a binary file and create a text file. Therefore, be sure you open the encode output stream and the decode input stream in binary mode.</p>
+<h3 id="program-organization">Program Organization</h3>
+<p>Your source code will consist of four implementation files and two headers.</p>
+<ul>
+<li><p><code>codes.c</code> / <code>codes.h</code><br /> This component will contain a data structure for representing the contents of the code file, along with functions to convert between symbols and the variable-length binary codes used to represent them.</p></li>
+<li><p><code>bits.c</code> / <code>bits.h</code><br /> This component will define functions for writing out bit sequences to and from a file. With the help of these functions, it will be easy for the main program to read and write the bit codes needed for encoding/decoding. Some of the header for this component has already been written for you in the starter. You can add more functions to this component if you want to.</p></li>
+<li><p><code>encode.c</code><br /> This component will implement the main function of the encode program. It will be responsible for handling the command-line arguments, reading characters from the input file, using the <code>codes</code> component to convert them to codes, and using the <code>bits</code> component to write them out to the output file.</p></li>
+<li><p><code>decode.c</code><br /> This component will implement the main function of the decode program. It will be responsible for handling the command-line arguments, using the <code>bits</code> component to read codes from the input file, using the <code>codes</code> component to convert them back to characters and writing those to the output file.</p></li>
+</ul>
+<p>As part of your implementation, you will need to define and use certain functions we're expecting. You'll proably want to define some additional functions, to help simplify and organize your implementation.</p>
+<ul>
+<li><p><code>const char * symToCode( int ch );</code><br /> Given the ASCII code for a character or EOF (-1), this function returns a string containing the code used to represent it. For example, if you are using the <code>codes-1.txt</code> code file, <code>symToCode(     'a' )</code> should return &quot;0000&quot; and <code>symToCode(EOF)</code> should return &quot;11010000111&quot;. The string returned by this function can't be changed by the caller, and it doesn't need to be freed by the caller (see <a
+    href="#codeRep">Code Representation</a> below). If there's no code to represent the given character, this function returns NULL.</p></li>
+<li><p><code>int codeToSym( const char *code );</code><br /> Given a string containing a code, this function returns the ASCII character it represents or EOF (-1). For example, if you are using <code>codes-1.txt</code>, <code>codeToSym( &quot;0000&quot; )</code> should return 'a' and codeToSym( &quot;11010000111&quot; ) should return EOF. If the code does not represent a character, this function returns <code>-2</code>.</p></li>
+</ul>
+<p>The bits.h header is already written for you, but you can add more functions if you want. There's some additional description of it in the next section. It will implement at least the following three functions.</p>
+<ul>
+<li><p><code>void writeBits( const char *code, BitBuffer *buffer, FILE *fp );</code><br /> Write the code stored in the code parameter. Temporarily store bits in the given buffer until we have 8 of them to write, then write the resulting byte to the given file.</p></li>
+<li><p><code>void flushBits( BitBuffer *buffer, FILE *fp );</code><br /> If there are any bits buffered in buffer, write them out to the given file in the high-order bit positions of the next byte, leaving zeros in the low-order bits. When you're done writing out codes, you'll need to call this function to make sure any bits in the last, partially full byte get written out.</p></li>
+<li><p><code>int readBit( BitBuffer *buffer, FILE *fp );</code><br /> Read and return the next bit (0 or 1) from the given file or -1 if the end of file has been reached. The given buffer may contain some bits left over from the last read, and if this read has any left-over bits, it should leave them in that buffer.</p></li>
+</ul>
+<h3 id="code-representation">Code Representation</h3>
+<p><a name="codeRep"></p>
+<p>In your codes component, you will need to define how you want to represent the contents of the code file. You'll need to store all these codes in some kind of data structure in memory, so you can quickly find the binary representation for a character, or the character that corresponds to a given sequence of bits. You get to choose how to represent this data structure. You can either store it statically, or dynamically allocate it.</p>
+<p>Your codes component will need a function to read the contents of the code file at program start-up, and if you dynamically allocate the data structure you use to represent codes, you'll need a function to free this data structure at program termination.</p>
+<p>In your data structure, you'll need to store a string of 1 and 0 characters for each code. Whenver the <code>symToCode()</code> function is called, you'll return a pointer to the string for that code. This is an efficient way to give the code back to the caller, letting the caller use part of the data structure instead of making a copy every time we need a code. Since you're letting the caller see part of your data structure, we marked the return value as const, so client code won't try to change what's in the string. Also, since you're just returning a pointer to an existing string, you don't have to allocate space or copy the string before you return it, or worry about freeing the string when the caller is done with it.</p>
+<h3 id="bit-buffering">Bit Buffering</h3>
+<p>File I/O operations will let you read one or more bytes at a time, but they won't let you read or write individual bits one at a time. To write out bit sequences that don't start and end on byte boundaries, we'll need to temporarily buffer some bits until we have 8 of them (a byte) that we can write out. The same will be true for reading. We have to read a whole byte at a time, but if we only need some bits from that byte, we'll keep the rest buffered until we're ready for them.</p>
+<p>In the <code>bits.h</code> header, the starter includes a definition of a simple structure you'll use for buffering bits during reading and writing (along with prototypes for the functions that use it). It's called BitBuffer and it has just two fields, one for temporarily storing up to 8 bits and another for keeping up with how many bits are buffered.</p>
+<pre><code>typedef struct {
+  /** Storage for up to 8 bits left over from an earlier read or waiting
+      to be written in a subsequent write. */
+  unsigned char bits;
+
+  /** Number of bits currently buffered. */
+  int bcount;
+} BitBuffer;</code></pre>
+<p>You'll need to use a BitBuffer while reading or writing an encoded file, to temporarily store a number of bits that doesn't constitute a whole byte. For example, if the first code requires 5 bits, you'll have 3 bits that you don't need yet. You will store the first part (or all) of the next code in the remaining 3 bits, and then write the byte to the binary output file.</p>
+<p>You have some freedom in how you use the BitBuffer during reading and writing. For example, you could keep buffered bits in the high-order bits of the <code>bits</code> field, shifting everything to the left as you remove bits from the buffer. Or, you could keep every bit in the position it started in when you read it, and use a movable mask to look at individual bits when you need them. You could even manage the buffer differently for reading and writing; whatever is easiest for you to understand and implement.</p>
+<h1 id="build-automation">Build Automation</h1>
+<p>You get to implement your own Makefile for this project (called <code>Makefile</code> with a capital 'M', no filename extension). Its default target should build both your encode and decode programs, compiling each source file to an object file and then linking the objects together into an executable.</p>
+<p>As usual, your Makefile should correctly describe the project's dependencies, so targets can be rebuilt selectively, based on what parts of the project have changed. It should compile source files with our usual command-line options, including <code>-g</code> for help with debugging. It should also have a clean rule, to let the user discard temporary files as needed.</p>
+<!--# Extra Credit
+
+For 8 points of *extra credit*, you can create a smarter version of
+your compressor, one that checks first to make sure the compressed
+encode doesn't make the file larger.  If compression doesn't yield a
+larger file, it will compress the file as usual.  If not, it will
+write out a 5-bit format code of zero and then an 8-bit code for each
+byte of the input file.  So, if the file doesn't respond well to our
+compression technique, we'll represent it directly, 8 bits per byte.
+This will still result in a slightly larger file (because of extra 5
+bits at the start), but it will guarantee that files that don't
+respond to this compression technique only get one byte larger.
+
+Extend your `unsqueeze` program so it recognizes a format code of
+either 0 or 1 and decompresses the file correctly in either case.
+
+We'll call this smarter version of your program `esqueeze` (for
+extended squeeze), but it will be implemented with the same source
+file as squeeze.  Have your makefile build two different targets from
+the same source files, one called `squeeze` and one called
+`esqueeze`.  (we could do this with links in the filesystem, but just
+building two identical executables will be easier to manage).
+
+Inside the program, you'll check the value of the
+zero-th command-line argument to see what name they ran the program
+under.  If it was run as `./esqueeze`, you'll exhibit the extra-credit
+behavior.  Otherwise, it will just behave like the regular squeeze
+program.  That way, your solution will still pass all the tests even
+if you implemented the extra credit.
+
+Once you have the extra credit working, you should be able to run it
+as follows. I put in some shell comments to explain what I'm doing.
+
+    # This file should compress some
+    $ ls -l input-7.txt
+    -rwxrwx--- 1 root vboxsf 256019 Nov  8 12:49 input-7.txt
+    $ ./esqueeze input-7.txt compressed.bin
+    # And it still does, even with the extra-credit behavior.
+    $ ls -l compressed.bin 
+    -rwxrwx--- 1 root vboxsf 198787 Nov  9 08:02 compressed.bin
+    # decompressing yields the original file
+    $ ./unsqueeze compressed.bin output.txt
+    $ diff output.txt input-7.txt 
+    # This file won't compress
+    $ ls -l input-ec1.txt
+    -rwxrwx--- 1 root vboxsf 390 Nov  8 11:07 input-ec1.txt
+    # See, with the original squeeze program, it gets larger
+    $ ./squeeze input-ec1.txt compressed.bin
+    $ ls -l compressed.bin 
+    -rwxrwx--- 1 root vboxsf 555 Nov  9 08:04 compressed.bin
+    # But, with the extended squeeze program, it just gets
+    # one byte larger
+    $ ./esqueeze input-ec1.txt compressed.bin
+    $ ls -l compressed.bin 
+    -rwxrwx--- 1 root vboxsf 391 Nov  9 08:04 compressed.bin
+    # And, the decompressor is smart enough to decompress either format.
+    $ ./unsqueeze compressed.bin output.txt
+    $ diff output.txt input-ec1.txt-->
+
+<h1 id="testing">Testing</h1>
+<p>The starter includes a test script, along with test input files and expected outputs. When we grade your program, we'll test it with this script, along with a few other test inputs we're not giving you. To run the automated test script, you should be able to enter the following:</p>
+<pre><code>$ chmod +x test.sh # probably just need to do this once
+$ ./test.sh</code></pre>
+<p>This will automatically build your program and see how it does against all the tests.</p>
+<p>As you develop and debug your programs, you'll want to be able to run them yourself, to see what they're doing and maybe try them out inside the debugger. As you run the test script, you'll see it reports on how it's running your program for each test. You can copy this command to run your program directly to get a better idea of how it's behaving.</p>
+<h2 id="binary-file-report">Binary File Report</h2>
+<p>To help debug, I'm providing source code for a simple program that prints out the contents of a file in binary. This may help you to see if the bit sequences you're trying to write to a file are really making it there. It's called dumpbits.c. You can compile it like any C program, then redirect standard input from a file to get it to printout the contents of any file in binary. For example, if you run it as follows, it will show the contents of the encoded representation for test case 1 using codes-1.txt:</p>
+<pre><code>csc$ ./dumpbits &lt; encoded-1.bin 
+0000 00100110
+0001 11110100
+0002 00110110
+0003 10000111</code></pre>
+<p>Be careful about running this program on a windows system. I'm worried that, since it's reading from standard input, it will give you text stream behavior on the input, rather than binary. It should work fine on the common platform, since there's no difference between a text and a binary stream.</p>
+<h2 id="memory-error-and-leaks">Memory Error and Leaks</h2>
+<p>When it terminates successfully, your program is expected to free all of the dynamically allocated memory it allocates and close any files it opens. Valgrind can help you find memory errors or leaked files.</p>
+<p>To get valgrind to check for memory errors in one of your programs, you can run your program like this:</p>
+<pre><code>$ valgrind --tool=memcheck --leak-check=full ./encode codes-1.txt input-1.txt encoded.bin
+-lots of valgrind output deleted-</code></pre>
+<p>To get it to look for file leaks instead, you can run it like the following. You'll get a report that file descriptors 0, 1 and 2 are still open. That's normal; those are standard input, standard output and standard error. If you see others, that's probably a file leak.</p>
+<pre><code>$  valgrind --track-fds=yes ./decode codes-1.txt encoded-1.bin output.txt
+-lots of valgrind output deleted-</code></pre>
+<p>Remember, valgrind will be able to give you a more useful report if you compile with the <code>-g</code> flag, so don't forget it.</p>
+<h2 id="test-inputs">Test Inputs</h2>
+<p>Most of the test cases involve encoding a file and then decoding it to recover the original input. So, the first 8 of these test cases are tests for both programs. The rest address error cases, so they just test one of the two programs.</p>
+<ol style="list-style-type: decimal">
+<li>An input file containing three symbols (g, o, newline) that uses codes-1.txt and fits exactly into 4 bytes (with no need for extra 0s at the end).</li>
+<li>An input file containing three symbols (a, t, newline) that uses codes-1.txt and requires 2 extra 0s at the end.</li>
+<li>A file containing three letters separated by spaces that uses codes-1.txt.</li>
+<li>A file containing each letter of the alphabet followed by a newline that uses codes-1.txt.</li>
+<li>A file containing each letter of the alphabet followed by a newline that uses codes-2.txt.<br /></li>
+<li>A file containing words starting with each letter of the alphabet that uses codes-1.txt.</li>
+<li>A file containing words starting with each letter of the alphabet that uses codes-2.txt.</li>
+<li>An empty file that uses codes-1.txt.<br /></li>
+<li>A error-handling test for <code>decode</code> that uses codes-1.txt and does not contain valid codes.</li>
+<li>A error-handling test for <code>encode</code> that uses codes-1.txt and an input file that contains uppercase letters.</li>
+<li>A error-handling test for <code>encode</code> with only one command-line argument:<br /> csc$ ./encode codes-1.txt<br> usage: encode &lt;codes-file&gt; &lt;infile&gt; &lt;outfile&gt;<br></li>
+<li>A error-handling test for <code>decode</code> with a nonexistent file.<br> csc$ ./decode codes-1.txt encoded-12.bin output.txt<br> encoded-12.bin: No such file or directory</li>
+<li>A error-handling test for <code>encode</code> that uses bad-codes.txt.</li>
+</ol>
+<h1 id="grading">Grading</h1>
+<p>The grade for your programs will depend mostly on how well they function. We'll also expect them to compile cleanly, to follow the style guide and to follow the design given for each program. We'll also try your programs under valgrind, to see if it can find anything to complain about.</p>
+<ul>
+<li>Compiling cleanly on the common platform: <strong>10 points</strong></li>
+<li>Working Makefile: <strong>8 points</strong></li>
+<li>Behaves correctly on all tests: <strong>60 points</strong></li>
+<li>Program follows the style guide: <strong>20 points</strong></li>
+<li>Deductions
+<ul>
+<li>Up to <strong>-60 percent</strong> for not following the required design.</li>
+<li>Up to <strong>-30 percent</strong> for failing to submit required files or submitting files with the wrong name.</li>
+<li>Up to <strong>-30 percent</strong> penalty for file leaks, memory leaks or other memory errors.</li>
+<li><strong>-20 percent</strong> penalty for late submission.</li>
+</ul></li>
+</ul>
+<p><a name="started"></a></p>
+<h1 id="getting-started">Getting Started</h1>
+<p><a name="started"></p>
+<p>To get started on this project, you'll need to clone your NCSU github repo and unpack the given starter into the p5 directory of your repo. You'll submit by checking files into your repo and pushing the changes back up to the NCSU github.</p>
+<h2 id="clone-your-repository">Clone your Repository</h2>
+<p>You should have already cloned your assigned NCSU github repo when you were working on Project 2. If you haven't already done this, go back to the assignment for <a href="http://courses.ncsu.edu/csc230/common/proj/p2/p2.html">Project 2</a> and follow the instructions for cloning your repo.</p>
+<h2 id="unpack-the-starter-into-your-cloned-repo">Unpack the starter into your cloned repo</h2>
+<p>Make sure you're in the <code>p5</code> directory in your cloned repo. You will need to copy and unpack the Project 5 starter. We're providing this as a compressed tar archive, <a href="starter5.tgz">starter5.tgz</a>. After you download this file, you can unpack its contents into your <code>p5</code> directory. As with previous assignments, remember there's a <code>.gitignore</code> file that needs to be there, even though this file won't show up (by default) in a directory listing.</p>
+<p>As usual, if you are logged in on one of the common platform systems, you can save yourself a few steps by unpacking the starter directly from our official copy in AFS. Be sure you're in the <code>p5</code> directory of your repo and run:</p>
+<pre><code>$ tar xzvpf /afs/eos.ncsu.edu/courses/csc/csc230/common/www/proj/p5/starter5.tgz</code></pre>
+<h2 id="instructions-for-submission">Instructions for Submission</h2>
+<p>If you've set up your repository properly, pushing your changes to your assigned CSC230 repository should be all that's required for submission. When you're done, we're expecting your repo to contain the following files. You can use the web interface on github.ncsu.edu to confirm that the right versions of all your files made it.</p>
+<ul>
+<li><code>encode.c</code> : source file, created by you.</li>
+<li><code>decode.c</code> : source file, created by you.</li>
+<li><code>codes.c</code> : source file, created by you.</li>
+<li><code>codes.h</code> : header file, created by you.</li>
+<li><code>bits.h</code> : header file, provided with the starter, maybe with some more function prototypes added by you.</li>
+<li><code>bits.c</code> : source file, created by you.</li>
+<li><code>Makefile</code> : the project's makefile, created by you.</li>
+<li>codes-*.txt : code files, provided with the starter</li>
+<li>bad-codes.txt : bad code file, provided with the starter</li>
+<li><code>input-*.txt</code> : test inputs given to the <code>encode</code> program, provided with the starter. These are also the expected decoded results for the <code>decode</code> program.</li>
+<li><code>encoded-*.bin</code> : expected encoded results for each input, provided with the starter. These are also the test inputs for the <code>decode</code> program.</li>
+<li><code>stderr-*.txt</code> : expected error output for a few of the tests.</li>
+<li><code>test.sh</code> : test script, provided with the starter.</li>
+<li><code>.gitignore</code> : a file provided with the starter, to tell git not to track temporary files for this project.</li>
+</ul>
+<h2 id="pushing-your-changes">Pushing your Changes</h2>
+<p>To submit your project, you'll need to commit your changes to your cloned repo, then push them to the NCSU github. <a href="http://courses.ncsu.edu/csc230/common/proj/p2/p2.html">Project 2</a> has more detailed instructions for doing this, but I've also summarized them here.</p>
+<p>As you make changes to your project, you'll need to stage new or modified files in the index:</p>
+<pre><code>$ git add .</code></pre>
+<p>Then, before you commit, it's a good idea to check to make sure your index has the right files staged:</p>
+<pre><code>$ git status</code></pre>
+<p>Once you've staged a set of related changes, commit them locally:</p>
+<pre><code>$ git commit -am &quot;&lt;meaningful message for future self&gt;&quot;</code></pre>
+<p>Of course, you haven't really submitted anything until you push your changes up to the NCSU github:</p>
+<pre><code>$ unset SSH_ASKPASS # if needed
+$ git push</code></pre>
+<h2 id="checking-jenkins-feedback">Checking Jenkins Feedback</h2>
+<p>Checking jenkins feedback is similar to the previous Project. Visit our Jenkins system at <a href="http://go.ncsu.edu/jenkins-csc230">http://go.ncsu.edu/jenkins-csc230</a> and you'll see a new build job for Project 5. This job polls your repo periodically for changes and rebuilds and tests your project automatically whenever it sees a change.</p>
+<p><a name="outcomes"></a></p>
+<h1 id="learning-outcomes">Learning Outcomes</h1>
+<p>The syllabus lists a number of learning outcomes for this course. This assignment is intended to support several of theses:</p>
+<ul>
+<li><p>Write small to medium C programs having several separately-compiled modules</p></li>
+<li><p>Explain what happens to a program during preprocessing, lexical analysis, parsing, code generation, code optimization, linking, and execution, and identify errors that occur during each phase. In particular, they will be able to describe the differences in this process between C and Java.</p></li>
+<li><p>Correctly identify error messages and warnings from the preprocessor, compiler, and linker, and avoid them.</p></li>
+<li><p>Find and eliminate runtime errors using a combination of logic, language understanding, trace printout, and gdb or a similar command-line debugger.</p></li>
+<li><p>Interpret and explain data types, conversions between data types, and the possibility of overflow and underflow</p></li>
+<li><p>Explain, inspect, and implement programs using structures such as enumerated types, unions, and constants and arithmetic, logical, relational, assignment, and bitwise operators.</p></li>
+<li><p>Trace and reason about variables and their scope in a single function, across multiple functions, and across multiple modules.</p></li>
+<li><p>Allocate and deallocate memory in C programs while avoiding memory leaks and dangling pointers. In particular, they will be able to implement dynamic arrays and singly-linked lists using allocated memory.</p></li>
+<li><p>Use the C preprocessor to control tracing of programs, compilation for different systems, and write simple macros.</p></li>
+<li><p>Write, debug, and modify programs using library utilities, including, but not limited to assert, the math library, the string library, random number generation, variable number of parameters, standard I/O, and file I/O</strong>.</p></li>
+<li><p>Use simple command-line tools to design, document, debug, and maintain their programs.</p></li>
+<li><p>Use an automatic packaging tool, such as make or ant, to distribute and maintain software that has multiple compilation units.</p></li>
+<li><p>Use a version control tools, such as subversion (svn) or git, to track changes and do parallel development of software.</p></li>
+<li><p>Distinguish key elements of the syntax (what's legal), semantics (what does it do), and pragmatics (how is it used) of a programming language.</p></li>
+</ul>
+</body>
+</html>
