@@ -14,11 +14,12 @@
   * you'll probably delete most of the code and replace it with your own code
   */
 
+#include "parse.h"
+#include "pattern.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pattern.h"
-#include "parse.h"
+#include <stdbool.h>
 
 // On the command line, which argument is the pattern.
 #define PAT_ARG 1
@@ -26,38 +27,44 @@
 // On the command line, which argument is the input file.
 #define FILE_ARG 2
 
-// You won't need this function in the final version of your program. //TODO
-// It prints out the input string and all matches of the pattern inside
-// it.
-void reportMatches( Pattern *pat, char const *pstr, char const *str )
+/**
+  * Reports appropriately highlighted words.
+  *
+  * @param pat pattern to used
+  * @param str single line
+  * @return true if match found
+  */
+bool reportValidRegex(Pattern *pat, const char *str)
 {
-  // Report the original string and copies of all the matches.
-  printf( "Pattern: %s\n", pstr );
-  printf( "String:  %s\n", str );
-
-  int len = strlen( str );
-  bool mflag = false;
-  for ( int begin = 0; begin <= len; begin++ )
-    for ( int end = begin; end <= len; end++ )
-      if ( matches( pat, begin, end ) ) {
-        // Report the matching substring.
-        
-        // Skip over to the start of the match.
-        printf( "Match:   %*s", begin, "" );
-        
-        // Print the matchng string.
-        for ( int k = begin; k < end; k++ )
-          printf( "%c", str[ k ] );
-        printf( "\n" );
-
-        // Remember that we found a match.
-        mflag = true;
+  bool match = false;
+  int bookmark = 0;
+  for (int begin = 0; begin < strlen(str); begin++) {
+    for (int end = begin; end <= strlen(str); end++) {
+      if (matches(pat, begin, end)) {
+        match = true;
+        if (begin != 0) {
+          for (int i = bookmark; i < begin; i++) { //print before red
+            printf("%c", str[i]);
+          }
+        }
+        printf("%c[31m", 27); //change font color to red
+        while (begin != end) {
+          printf("%c", str[begin]);
+          begin++;
+        }
+        printf("%c[0m", 27); //change color back to normal
+        bookmark = end;
       }
+    }
+  }
 
-  if ( !mflag )
-    printf( "No matches\n" );
-  
-  printf( "\n" );
+  if (match) {
+    for (int i = bookmark; i < strlen(str); i++) {
+      printf("%c", str[i]);
+    }
+    printf("\n");
+  }
+  return match;
 }
 
 /**
@@ -77,38 +84,69 @@ int main( int argc, char *argv[] )
   // report matching lines with occurrences of the matches
   // highlighted.
 
-  
-  // Try matching a pattern containing just one letter.
-  {
-    // Parse a simple pattern.
-    char *pstr = "b";
-    Pattern *pat = parsePattern( pstr );
-
-    char *str = "abc";
-
-    // Find matches for this pattern.
-    pat->locate( pat, str );
-
-    reportMatches( pat, pstr, str );
-
-    pat->destroy( pat );
+  if (argc <= 1 || argc > 3) {
+      fprintf(stderr, "usage: regular <pattern> [input-file.txt]\n");
+      return EXIT_FAILURE;
   }
 
-  // Try a pattern with some concatenation and multiple matches.
-  {
-    // Parse a simple pattern.
-    char *pstr = "aba";
-    Pattern *pat = parsePattern( pstr );
 
-    char *str = "ababababababab";
-
-    // Find matches for this pattern.
-    pat->locate( pat, str );
-
-    reportMatches( pat, pstr, str );
-
-    pat->destroy( pat );
+  char *patternString = argv[1];
+  Pattern *pattern = parsePattern(patternString);
+  FILE *input = argc == 2 ? stdin: fopen(argv[2], "r");
+  if (!input) {
+      pattern->destroy(pattern);
+      fprintf(stderr, "Can't open input file: %s\n", argv[2]);
+      return EXIT_FAILURE;
+  }
+  char *string = (char *)malloc(100 * sizeof(char));
+  char last;
+  while (fscanf(input, "%99[^\n]", string) != EOF) {
+    fscanf(input, "%c", &last);
+    if (last != '\n') {
+      fprintf(stderr, "Input line too long\n");
+      fclose(input);
+      free(string);
+      pattern->destroy(pattern);
+      return EXIT_FAILURE;
+    }
+    pattern->locate(pattern, string);
+    reportValidRegex(pattern, string);
   }
 
+  // provided by the TS; to be deleted in the final submission
+  // // Try matching a pattern containing just one letter.
+  // {
+  //   // Parse a simple pattern.
+  //   char *pstr = "b";
+  //   Pattern *pat = parsePattern( pstr );
+  //
+  //   char *str = "abc";
+  //
+  //   // Find matches for this pattern.
+  //   pat->locate( pat, str );
+  //
+  //   // reportMatches( pat, pstr, str );
+  //
+  //   pat->destroy( pat );
+  // }
+  //
+  // // Try a pattern with some concatenation and multiple matches.
+  // {
+  //   // Parse a simple pattern.
+  //   char *pstr = "aba";
+  //   Pattern *pat = parsePattern( pstr );
+  //
+  //   char *str = "ababababababab";
+  //
+  //   // Find matches for this pattern.
+  //   pat->locate( pat, str );
+  //
+  //   // reportMatches( pat, pstr, str );
+  //
+  //   pat->destroy( pat );
+  // }
+  pattern->destroy(pattern);
+  fclose(input);
+  free(string);
   return EXIT_SUCCESS;
 }

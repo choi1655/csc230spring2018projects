@@ -27,7 +27,7 @@
 /** A short name to use for the Pattern interface. */
 typedef struct PatternStruct Pattern;
 
-/** 
+/**
   * Structure used as a superclass/interface for a regular expression
   * pattern.  It includes a representation for a resizable 2D table
   * where we can record regions (substrings) of an input string that are
@@ -40,7 +40,7 @@ struct PatternStruct {
   /** Length of the current input string, as recorded by the latest call
       to locate(). */
   int len;
-  
+
   /** The match table, a (len + 1) X (len + 1) 2D array represented as
       an array of pointers to arrays.  The job of the locate() functon
       is to fill in this table so table[ begin ][ end ] is true if
@@ -77,7 +77,7 @@ struct PatternStruct {
   */
 bool matches( Pattern *pat, int begin, int end );
 
-/** 
+/**
   * Make a pattern for a single, non-special character, like `a` or `5`.
   *
   * @param sym The symbol this pattern is supposed to match.
@@ -85,7 +85,7 @@ bool matches( Pattern *pat, int begin, int end );
   */
 Pattern *makeSymbolPattern( char sym );
 
-/** 
+/**
   * Make a pattern for the concatenation of patterns p1 and p2.  It
   * should match anything that can be broken into two substrings, s1 and
   * s2, where the p1 matches the first part (s1) and p2 matches the
@@ -97,4 +97,29 @@ Pattern *makeSymbolPattern( char sym );
   */
 Pattern *makeConcatenationPattern( Pattern *p1, Pattern *p2 );
 
+/**
+  * Makes a alternation pattern for patterns p1 and p2.
+  *
+  * @param p1 subpattern one
+  * @param p2 subpattern two
+  * @return Pattern pointer to the pattern made
+  */
+Pattern *makeAlternationPattern(Pattern *p1, Pattern *p2);
+
+/**
+  * Makes a repetition pattern using pattern and regex passed in.
+  *
+  * @param p subpattern for matching regex
+  * @param pattern regex pattern to match
+  * @return Pattern pointer to the pattern made
+  */
+Pattern *makeRepetitionPattern(Pattern *p, char pattern);
+
+/**
+  * Makes pattern for the bracket.
+  *
+  * @param str string between the set of brackets
+  * @return Pattern pointer to the pattern made
+  */
+Pattern *makeBracketPattern(char *str);
 #endif
